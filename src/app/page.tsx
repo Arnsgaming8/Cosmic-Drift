@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const minimapRef = useRef<HTMLCanvasElement>(null);
+  const [gameStarted, setGameStarted] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -488,12 +489,6 @@ export default function Home() {
 
     function startGame() {
       gameState = 'playing';
-      const titleScreen = document.getElementById('titleScreen');
-      const hud = document.getElementById('hud');
-      const minimap = document.getElementById('minimap');
-      if (titleScreen) titleScreen.classList.add('hidden');
-      if (hud) (hud as HTMLElement).style.display = 'block';
-      if (minimap) (minimap as HTMLElement).style.display = 'block';
     }
 
     function togglePause() {
@@ -605,11 +600,6 @@ export default function Home() {
     generateNebulae();
     spawnInitialArtifacts();
 
-    const hud = document.getElementById('hud');
-    const minimap = document.getElementById('minimap');
-    if (hud) (hud as HTMLElement).style.display = 'none';
-    if (minimap) (minimap as HTMLElement).style.display = 'none';
-
     requestAnimationFrame(gameLoop);
 
     return () => {
@@ -653,19 +643,28 @@ export default function Home() {
         zIndex: 10
       }} />
 
-      <div id="titleScreen" style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 100,
-        background: 'radial-gradient(ellipse at center, rgba(26, 10, 46, 0.9) 0%, rgba(3, 3, 8, 0.98) 100%)'
-      }}>
+      <div 
+        id="titleScreen" 
+        onClick={() => setGameStarted(true)}
+        onTouchStart={(e) => {
+          e.preventDefault();
+          setGameStarted(true);
+        }}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          display: gameStarted ? 'none' : 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 100,
+          cursor: 'pointer',
+          background: 'radial-gradient(ellipse at center, rgba(26, 10, 46, 0.9) 0%, rgba(3, 3, 8, 0.98) 100%)'
+        }}
+      >
         <h1 style={{
           fontFamily: "'Orbitron', sans-serif",
           fontSize: 'clamp(36px, 8vw, 72px)',
@@ -720,7 +719,7 @@ export default function Home() {
         color: '#c8d4e3',
         fontSize: '12px',
         letterSpacing: '1px',
-        display: 'none'
+        display: gameStarted ? 'block' : 'none'
       }}>
         <div style={{
           background: 'rgba(13, 27, 42, 0.6)',
@@ -772,7 +771,7 @@ export default function Home() {
         boxShadow: '0 0 30px rgba(123, 104, 238, 0.2), inset 0 0 30px rgba(0, 0, 0, 0.5)',
         zIndex: 20,
         overflow: 'hidden',
-        display: 'none'
+        display: gameStarted ? 'block' : 'none'
       }}>
         <canvas 
           ref={minimapRef}
