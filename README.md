@@ -4,7 +4,7 @@ An immersive space exploration game that runs directly in your browser.
 
 ## Play Online
 
-Open `game.html` in any modern browser, or deploy to GitHub Pages.
+Open `index.html` in any modern browser, or deploy to GitHub Pages.
 
 ## How to Play
 
@@ -22,7 +22,7 @@ Open `game.html` in any modern browser, or deploy to GitHub Pages.
 5. Click Save
 6. Your game will be available at `https://yourusername.github.io/repository-name/`
 
-Or simply upload `game.html` to any web host - it's a standalone file with no dependencies.
+Or simply upload `index.html` to any web host - it's a standalone file with no dependencies.
 
 ## Controls
 
