@@ -216,7 +216,7 @@
 
         function spawnArtifact() {
             const angle = Math.random() * Math.PI * 2;
-            const dist = 300 + Math.random() * 800;
+            const dist = 200 + Math.random() * 600;
             artifacts.push({
                 x: ship.x + Math.cos(angle) * dist,
                 y: ship.y + Math.sin(angle) * dist,
@@ -225,8 +225,24 @@
             });
         }
 
+        function spawnNearbyArtifact() {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 150 + Math.random() * 300;
+            artifacts.push({
+                x: ship.x + Math.cos(angle) * dist,
+                y: ship.y + Math.sin(angle) * dist,
+                radius: 15,
+                pulse: Math.random() * Math.PI * 2
+            });
+        }
+
+        let lastArtifactSpawnPos = { x: 0, y: 0 };
+        let distanceSinceLastSpawn = 0;
+
         function spawnInitialArtifacts() {
             for (let i = 0; i < 20; i++) spawnArtifact();
+            lastArtifactSpawnPos.x = ship.x;
+            lastArtifactSpawnPos.y = ship.y;
         }
 
         function updateShip(dt) {
@@ -296,6 +312,18 @@
                     angle: ship.angle + Math.PI / 2,
                     life: 1
                 });
+            }
+
+            const dx = ship.x - lastArtifactSpawnPos.x;
+            const dy = ship.y - lastArtifactSpawnPos.y;
+            distanceSinceLastSpawn += Math.sqrt(dx * dx + dy * dy);
+            lastArtifactSpawnPos.x = ship.x;
+            lastArtifactSpawnPos.y = ship.y;
+
+            if (distanceSinceLastSpawn > 400) {
+                distanceSinceLastSpawn = 0;
+                if (artifacts.length < 40) spawnNearbyArtifact();
+                else if (Math.random() > 0.5) spawnNearbyArtifact();
             }
 
             while (artifacts.length < 25) spawnArtifact();
