@@ -550,6 +550,42 @@ export default function Home() {
       }
     };
 
+    const handleTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+      if (gameState === 'title') {
+        startGame();
+        return;
+      }
+      
+      const touch = e.touches[0];
+      if (e.touches.length === 1) {
+        mouseX = touch.clientX;
+        mouseY = touch.clientY;
+        keys['KeyW'] = true;
+        ship.thrust = 1;
+      } else if (e.touches.length === 2) {
+        ship.boosting = true;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      mouseX = touch.clientX;
+      mouseY = touch.clientY;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      e.preventDefault();
+      if (e.touches.length === 0) {
+        keys['KeyW'] = false;
+        ship.thrust = 0;
+        ship.boosting = false;
+      } else if (e.touches.length === 1) {
+        ship.boosting = false;
+      }
+    };
+
     const handleVisibilityChange = () => {
       if (document.hidden && gameState === 'playing') {
         togglePause();
@@ -560,6 +596,9 @@ export default function Home() {
     window.addEventListener('keyup', handleKeyUp);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('click', handleClick);
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: false });
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     generateStars();
@@ -579,6 +618,9 @@ export default function Home() {
       window.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('click', handleClick);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
@@ -749,7 +791,8 @@ export default function Home() {
         fontSize: '11px',
         letterSpacing: '2px'
       }}>
-        WASD or ARROWS to move &bull; MOUSE to aim &bull; SHIFT to boost
+        <span className="desktop-controls">WASD or ARROWS to move &bull; MOUSE to aim &bull; SHIFT to boost</span>
+        <span className="mobile-controls" style={{ display: 'none' }}>TOUCH to aim & thrust &bull; TWO FINGERS to boost</span>
       </div>
 
       <style jsx global>{`
@@ -760,6 +803,10 @@ export default function Home() {
         @keyframes blink {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.3; }
+        }
+        @media (max-width: 768px), (pointer: coarse) {
+          .desktop-controls { display: none !important; }
+          .mobile-controls { display: inline !important; }
         }
       `}</style>
     </main>
