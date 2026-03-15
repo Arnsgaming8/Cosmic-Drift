@@ -105,6 +105,30 @@
             color: #7b68ee; font-size: 9px; text-transform: uppercase;
             margin-bottom: 8px; letter-spacing: 1px;
         }
+        .color-picker-wrapper {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(123, 104, 238, 0.3);
+        }
+        .color-picker-wrapper .label {
+            color: #7b68ee; font-size: 9px; text-transform: uppercase;
+            margin-bottom: 8px; letter-spacing: 1px;
+        }
+        .color-picker-wrapper input[type="color"] {
+            width: 100%;
+            height: 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: transparent;
+        }
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch {
+            border-radius: 4px;
+            border: 1px solid rgba(123, 104, 238, 0.5);
+        }
         .minimap {
             position: fixed; bottom: 20px; right: 20px;
             width: 150px; height: 150px; border-radius: 50%;
@@ -211,6 +235,10 @@
             <div class="skin-option" data-skin="5">
                 <svg viewBox="0 0 64 64" style="fill:#ffffff"><path d="M32 6L46 28L56 28L38 38L44 58L32 48L20 58L26 38L8 28L18 28Z"/><circle cx="32" cy="38" r="4"/></svg>
             </div>
+            <div class="color-picker-wrapper">
+                <div class="label">Color</div>
+                <input type="color" id="shipColorPicker" value="#00ffcc">
+            </div>
         </div>
         <div class="hud-row">
             <div class="hud-label">Velocity</div>
@@ -254,7 +282,7 @@
         let lastTime = 0;
         let hintFadeStarted = false;
 
-        const ship = { x: 0, y: 0, vx: 0, vy: 0, angle: 0, targetAngle: 0, thrust: 0, boosting: false, skin: 0 };
+        const ship = { x: 0, y: 0, vx: 0, vy: 0, angle: 0, targetAngle: 0, thrust: 0, boosting: false, skin: 0, color: '#00ffcc' };
         
         const shipSkins = [
             { name: 'Classic', draw: (ctx, size) => {
@@ -659,8 +687,8 @@
                 ctx.globalAlpha = 1;
             }
 
-            ctx.fillStyle = '#00ffcc';
-            ctx.shadowColor = '#00ffcc';
+            ctx.fillStyle = ship.color;
+            ctx.shadowColor = ship.color;
             ctx.shadowBlur = 20;
             shipSkins[ship.skin].draw(ctx, 25);
             ctx.shadowBlur = 0;
@@ -685,8 +713,8 @@
                     minimapCtx.fill();
                 }
             }
-            minimapCtx.fillStyle = '#00ffcc';
-            minimapCtx.shadowColor = '#00ffcc';
+            minimapCtx.fillStyle = ship.color;
+            minimapCtx.shadowColor = ship.color;
             minimapCtx.shadowBlur = 5;
             minimapCtx.beginPath();
             minimapCtx.arc(75, 75, 4, 0, Math.PI * 2);
@@ -764,6 +792,7 @@
         document.querySelectorAll('.skin-option').forEach((opt, i) => {
             opt.addEventListener('click', (e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 ship.skin = i;
                 document.querySelectorAll('.skin-option').forEach(o => {
                     o.classList.remove('selected');
@@ -771,12 +800,29 @@
                     o.querySelectorAll('svg *').forEach(c => c.style.fill = '#ffffff');
                 });
                 opt.classList.add('selected');
-                opt.querySelector('svg').style.fill = '#00ffcc';
-                opt.querySelectorAll('svg *').forEach(c => c.style.fill = '#00ffcc');
-                document.getElementById('skinMenu').classList.remove('open');
+                const color = document.getElementById('shipColorPicker').value;
+                opt.querySelector('svg').style.fill = color;
+                opt.querySelectorAll('svg *').forEach(c => c.style.fill = color);
+            });
+            opt.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
             });
             opt.querySelector('svg').style.fill = '#ffffff';
             opt.querySelectorAll('svg *').forEach(c => c.style.fill = '#ffffff');
+        });
+
+        document.getElementById('shipColorPicker').addEventListener('input', (e) => {
+            const color = e.target.value;
+            ship.color = color;
+            const selected = document.querySelector('.skin-option.selected');
+            if (selected) {
+                selected.querySelector('svg').style.fill = color;
+                selected.querySelectorAll('svg *').forEach(c => c.style.fill = color);
+            }
+        });
+        document.getElementById('shipColorPicker').addEventListener('click', (e) => {
+            e.stopPropagation();
         });
 
         document.addEventListener('click', () => {
