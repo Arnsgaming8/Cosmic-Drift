@@ -45,6 +45,21 @@
         }
         .hud-row { margin-bottom: 12px; }
         .hud-row:last-child { margin-bottom: 0; }
+        .pause-btn {
+            position: absolute; top: 10px; right: 10px;
+            width: 28px; height: 28px;
+            background: rgba(123, 104, 238, 0.3);
+            border: 1px solid rgba(123, 104, 238, 0.5);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: background 0.2s;
+        }
+        .pause-btn:hover { background: rgba(123, 104, 238, 0.5); }
+        .pause-btn::before, .pause-btn::after {
+            content: ''; width: 4px; height: 12px;
+            background: #c8d4e3; border-radius: 1px; margin: 0 2px;
+        }
         .minimap {
             position: fixed; bottom: 20px; right: 20px;
             width: 150px; height: 150px; border-radius: 50%;
@@ -85,6 +100,7 @@
             display: flex; justify-content: center; align-items: center;
             z-index: 90; background: rgba(3, 3, 8, 0.7);
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            cursor: pointer;
         }
         .paused-overlay.visible { opacity: 1; pointer-events: all; }
         .paused-overlay h2 {
@@ -118,10 +134,14 @@
     </div>
 
     <div class="paused-overlay" id="pausedOverlay">
-        <h2>PAUSED</h2>
+        <div style="text-align: center;">
+            <h2>PAUSED</h2>
+            <div style="color: rgba(200,212,227,0.5); font-size: 12px; margin-top: 20px; letter-spacing: 2px;">CLICK OR TAP TO RESUME</div>
+        </div>
     </div>
 
     <div class="hud hud-top-left hud-panel" id="hud">
+        <div class="pause-btn" id="pauseBtn"></div>
         <div class="hud-row">
             <div class="hud-label">Velocity</div>
             <div class="hud-value" id="velocity">0</div>
@@ -578,6 +598,17 @@
                 document.getElementById('pausedOverlay').classList.remove('visible');
             }
         }
+
+        document.getElementById('pauseBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePause();
+        });
+
+        document.getElementById('pausedOverlay').addEventListener('click', togglePause);
+        document.getElementById('pausedOverlay').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            togglePause();
+        });
 
         function handleResize() {
             width = window.innerWidth;
