@@ -63,6 +63,48 @@
             content: ''; width: 4px; height: 12px;
             background: #c8d4e3; border-radius: 1px; margin: 0 2px;
         }
+        .skin-btn {
+            position: absolute; top: 10px; right: 48px;
+            width: 28px; height: 28px;
+            background: rgba(123, 104, 238, 0.3);
+            border: 1px solid rgba(123, 104, 238, 0.5);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: background 0.2s;
+            z-index: 30;
+        }
+        .skin-btn:hover { background: rgba(123, 104, 238, 0.5); }
+        .skin-btn svg { width: 16px; height: 16px; fill: #c8d4e3; }
+        .skin-menu {
+            position: absolute; top: 45px; right: 0;
+            background: rgba(13, 27, 42, 0.95);
+            border: 1px solid rgba(123, 104, 238, 0.4);
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+            z-index: 35;
+        }
+        .skin-menu.open { display: block; }
+        .skin-option {
+            width: 40px; height: 40px;
+            background: rgba(123, 104, 238, 0.2);
+            border: 1px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+        }
+        .skin-option:hover, .skin-option.selected {
+            background: rgba(123, 104, 238, 0.4);
+            border-color: #00ffcc;
+        }
+        .skin-option svg { width: 24px; height: 24px; }
+        .skin-menu .label {
+            color: #7b68ee; font-size: 9px; text-transform: uppercase;
+            margin-bottom: 8px; letter-spacing: 1px;
+        }
         .minimap {
             position: fixed; bottom: 20px; right: 20px;
             width: 150px; height: 150px; border-radius: 50%;
@@ -146,6 +188,30 @@
 
     <div class="hud hud-top-left hud-panel" id="hud">
         <div class="pause-btn" id="pauseBtn"></div>
+        <div class="skin-btn" id="skinBtn">
+            <svg viewBox="0 0 24 24"><path d="M12 2L4 12l8 10 8-10L12 2zm0 4l4 6-4 5-4-5 4-6z"/></svg>
+        </div>
+        <div class="skin-menu" id="skinMenu">
+            <div class="label">Ship</div>
+            <div class="skin-option selected" data-skin="0">
+                <svg viewBox="0 0 64 64" style="fill:#ffffff"><polygon points="32,6 58,54 44,54 32,40 20,54 6,54"/></svg>
+            </div>
+            <div class="skin-option" data-skin="1">
+                <svg viewBox="0 0 64 64" style="fill:#ffffff"><polygon points="32,4 52,30 44,30 44,58 20,58 20,30 12,30"/></svg>
+            </div>
+            <div class="skin-option" data-skin="2">
+                <svg viewBox="0 0 64 64" style="fill:#ffffff"><polygon points="32,6 38,30 56,30 38,34 38,60 26,60 26,34 8,30 26,30"/></svg>
+            </div>
+            <div class="skin-option" data-skin="3">
+                <svg viewBox="0 0 64 64" style="fill:#ffffff"><polygon points="32,6 56,54 46,54 40,44 24,44 18,54 8,54"/><rect x="22" y="30" width="20" height="10"/><rect x="25" y="18" width="14" height="8"/></svg>
+            </div>
+            <div class="skin-option" data-skin="4">
+                <svg viewBox="0 0 64 64" style="fill:#ffffff"><polygon points="32,4 42,24 55,24 32,40 32,62 32,40 9,24 22,24"/></svg>
+            </div>
+            <div class="skin-option" data-skin="5">
+                <svg viewBox="0 0 64 64" style="fill:#ffffff"><path d="M32 6L46 28L56 28L38 38L44 58L32 48L20 58L26 38L8 28L18 28Z"/><circle cx="32" cy="38" r="4"/></svg>
+            </div>
+        </div>
         <div class="hud-row">
             <div class="hud-label">Velocity</div>
             <div class="hud-value" id="velocity">0</div>
@@ -188,7 +254,83 @@
         let lastTime = 0;
         let hintFadeStarted = false;
 
-        const ship = { x: 0, y: 0, vx: 0, vy: 0, angle: 0, targetAngle: 0, thrust: 0, boosting: false };
+        const ship = { x: 0, y: 0, vx: 0, vy: 0, angle: 0, targetAngle: 0, thrust: 0, boosting: false, skin: 0 };
+        
+        const shipSkins = [
+            { name: 'Classic', draw: (ctx, size) => {
+                ctx.beginPath();
+                ctx.moveTo(size, 0);
+                ctx.lineTo(-size * 0.6, -size * 0.5);
+                ctx.lineTo(-size * 0.4, 0);
+                ctx.lineTo(-size * 0.6, size * 0.5);
+                ctx.closePath();
+                ctx.fill();
+            }},
+            { name: 'Chevron', draw: (ctx, size) => {
+                ctx.beginPath();
+                ctx.moveTo(size, 0);
+                ctx.lineTo(size * 0.3, -size * 0.5);
+                ctx.lineTo(size * 0.3, size * 0.5);
+                ctx.closePath();
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(size * 0.6, 0);
+                ctx.lineTo(-size * 0.1, -size * 0.5);
+                ctx.lineTo(-size * 0.1, size * 0.5);
+                ctx.closePath();
+                ctx.fill();
+            }},
+            { name: 'Precision', draw: (ctx, size) => {
+                ctx.beginPath();
+                ctx.moveTo(size, 0);
+                ctx.lineTo(size * 0.4, -size * 0.3);
+                ctx.lineTo(size * 0.9, -size * 0.3);
+                ctx.lineTo(size * 0.4, 0);
+                ctx.lineTo(size * 0.9, size * 0.3);
+                ctx.lineTo(size * 0.4, size * 0.3);
+                ctx.closePath();
+                ctx.fill();
+            }},
+            { name: 'Armored', draw: (ctx, size) => {
+                ctx.beginPath();
+                ctx.moveTo(size, 0);
+                ctx.lineTo(size * 0.7, -size * 0.5);
+                ctx.lineTo(size * 0.4, -size * 0.5);
+                ctx.lineTo(size * 0.25, -size * 0.2);
+                ctx.lineTo(-size * 0.25, -size * 0.2);
+                ctx.lineTo(-size * 0.4, -size * 0.5);
+                ctx.lineTo(-size * 0.7, -size * 0.5);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillRect(-size * 0.3, -size * 0.15, size * 0.6, size * 0.3);
+                ctx.fillRect(-size * 0.2, -size * 0.35, size * 0.4, size * 0.15);
+            }},
+            { name: 'Comet', draw: (ctx, size) => {
+                ctx.beginPath();
+                ctx.moveTo(size, 0);
+                ctx.lineTo(size * 0.5, -size * 0.45);
+                ctx.lineTo(size * 0.9, -size * 0.45);
+                ctx.lineTo(size * 0.3, 0);
+                ctx.lineTo(size * 0.9, size * 0.45);
+                ctx.lineTo(size * 0.5, size * 0.45);
+                ctx.closePath();
+                ctx.fill();
+            }},
+            { name: 'Sci-Fi', draw: (ctx, size) => {
+                ctx.beginPath();
+                ctx.moveTo(size, 0);
+                ctx.lineTo(size * 0.6, -size * 0.45);
+                ctx.lineTo(size * 0.9, -size * 0.45);
+                ctx.lineTo(size * 0.4, 0);
+                ctx.lineTo(size * 0.9, size * 0.45);
+                ctx.lineTo(size * 0.6, size * 0.45);
+                ctx.closePath();
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(0, 0, size * 0.15, 0, Math.PI * 2);
+                ctx.fill();
+            }}
+        ];
         const camera = { x: 0, y: 0 };
         const worldSize = 100000;
 
@@ -520,13 +662,7 @@
             ctx.fillStyle = '#00ffcc';
             ctx.shadowColor = '#00ffcc';
             ctx.shadowBlur = 20;
-            ctx.beginPath();
-            ctx.moveTo(25, 0);
-            ctx.lineTo(-15, -12);
-            ctx.lineTo(-10, 0);
-            ctx.lineTo(-15, 12);
-            ctx.closePath();
-            ctx.fill();
+            shipSkins[ship.skin].draw(ctx, 25);
             ctx.shadowBlur = 0;
             ctx.restore();
             ctx.restore();
@@ -612,6 +748,39 @@
             e.stopPropagation();
             e.preventDefault();
             togglePause();
+        });
+
+        document.getElementById('skinBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            document.getElementById('skinMenu').classList.toggle('open');
+        });
+        document.getElementById('skinBtn').addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            document.getElementById('skinMenu').classList.toggle('open');
+        });
+
+        document.querySelectorAll('.skin-option').forEach((opt, i) => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                ship.skin = i;
+                document.querySelectorAll('.skin-option').forEach(o => {
+                    o.classList.remove('selected');
+                    o.querySelector('svg').style.fill = '#ffffff';
+                    o.querySelectorAll('svg *').forEach(c => c.style.fill = '#ffffff');
+                });
+                opt.classList.add('selected');
+                opt.querySelector('svg').style.fill = '#00ffcc';
+                opt.querySelectorAll('svg *').forEach(c => c.style.fill = '#00ffcc');
+                document.getElementById('skinMenu').classList.remove('open');
+            });
+            opt.querySelector('svg').style.fill = '#ffffff';
+            opt.querySelectorAll('svg *').forEach(c => c.style.fill = '#ffffff');
+        });
+
+        document.addEventListener('click', () => {
+            document.getElementById('skinMenu').classList.remove('open');
         });
 
         document.getElementById('pausedOverlay').addEventListener('click', togglePause);
