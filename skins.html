@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Drift - Ship Skins</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0f;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            color: #fff;
+            padding: 40px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 4px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .skin-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .skin-card:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.2);
+        }
+        .skin-card img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+        }
+        .skin-name {
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        .color-picker {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .color-picker label {
+            display: block;
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+        input[type="color"] {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background: none;
+        }
+        .preview {
+            margin-top: 40px;
+            text-align: center;
+            padding: 30px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+        }
+        .preview img {
+            width: 64px;
+            height: 64px;
+            transition: filter 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <h1>COSMIC DRIFT</h1>
+    <div class="subtitle">SHIP SKINS</div>
+    
+    <div class="grid">
+        <div class="skin-card">
+            <img src="arrow-classic.svg" alt="Classic">
+            <div class="skin-name">CLASSIC</div>
+        </div>
+        <div class="skin-card">
+            <img src="arrow-double-chevron.svg" alt="Double Chevron">
+            <div class="skin-name">DOUBLE CHEVRON</div>
+        </div>
+        <div class="skin-card">
+            <img src="arrow-precision.svg" alt="Precision">
+            <div class="skin-name">PRECISION</div>
+        </div>
+        <div class="skin-card">
+            <img src="arrow-armored.svg" alt="Armored">
+            <div class="skin-name">ARMORED</div>
+        </div>
+        <div class="skin-card">
+            <img src="arrow-comet.svg" alt="Comet">
+            <div class="skin-name">COMET</div>
+        </div>
+        <div class="skin-card">
+            <img src="arrow-sci-fi.svg" alt="Sci-Fi">
+            <div class="skin-name">SCI-FI</div>
+        </div>
+    </div>
+
+    <div class="color-picker">
+        <label>CHOOSE YOUR COLOR</label>
+        <input type="color" id="colorPicker" value="#00ffcc">
+    </div>
+
+    <div class="preview">
+        <div style="color: #666; font-size: 12px; letter-spacing: 2px; margin-bottom: 15px;">LIVE PREVIEW</div>
+        <img id="previewImg" src="arrow-classic.svg" alt="Preview">
+    </div>
+
+    <script>
+        const picker = document.getElementById('colorPicker');
+        const preview = document.getElementById('previewImg');
+        const cards = document.querySelectorAll('.skin-card img');
+        
+        picker.addEventListener('input', (e) => {
+            preview.style.filter = `drop-shadow(0 0 8px ${e.target.value})`;
+            cards.forEach(img => {
+                img.style.filter = `drop-shadow(0 0 8px ${e.target.value})`;
+            });
+        });
+        
+        cards.forEach((img, i) => {
+            img.style.filter = `drop-shadow(0 0 8px ${picker.value})`;
+            img.addEventListener('click', () => {
+                preview.src = img.src;
+            });
+        });
+    </script>
+</body>
+</html>
