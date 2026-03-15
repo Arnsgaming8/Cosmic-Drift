@@ -36,11 +36,14 @@
             border: 1px solid rgba(123, 104, 238, 0.3);
             border-radius: 8px;
             padding: 15px 20px;
-            padding-top: 35px;
+            padding-top: 40px;
             box-shadow: 0 0 20px rgba(123, 104, 238, 0.1), inset 0 0 20px rgba(0, 0, 0, 0.3);
             position: relative;
         }
-        .hud-top-left { position: absolute; top: 20px; left: 20px; }
+        .hud-top-left { 
+            position: absolute; top: 20px; left: 20px;
+            width: 140px;
+        }
         .hud-label { color: #7b68ee; font-size: 10px; text-transform: uppercase; margin-bottom: 2px; }
         .hud-value {
             font-family: 'Share Tech Mono', monospace; font-size: 18px;
@@ -166,33 +169,6 @@
             font-size: 16px; color: #c8d4e3; letter-spacing: 3px;
             animation: blink 2s ease-in-out infinite;
         }
-        .title-skins {
-            display: flex; gap: 10px; margin-bottom: 20px;
-        }
-        .title-skin {
-            width: 40px; height: 40px;
-            background: rgba(123, 104, 238, 0.2);
-            border: 2px solid transparent;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s;
-            padding: 5px;
-        }
-        .title-skin:hover { background: rgba(123, 104, 238, 0.4); }
-        .title-skin.selected { border-color: #00ffcc; background: rgba(123, 104, 238, 0.3); }
-        .title-skin svg { width: 100%; height: 100%; }
-        .title-color { margin-bottom: 30px; }
-        .title-color input[type="color"] {
-            width: 50px; height: 30px;
-            border: none; border-radius: 4px;
-            cursor: pointer; background: transparent;
-        }
-        .title-color input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        .title-color input[type="color"]::-webkit-color-swatch {
-            border-radius: 4px;
-            border: 1px solid rgba(123, 104, 238, 0.5);
-        }
         .paused-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; justify-content: center; align-items: center;
@@ -228,29 +204,6 @@
     <div class="title-screen" id="titleScreen">
         <h1>COSMIC DRIFT</h1>
         <div class="subtitle">AN INFINITE JOURNEY</div>
-        <div class="title-skins">
-            <div class="title-skin selected" data-skin="0">
-                <svg viewBox="0 0 64 64" style="fill:#00ffcc"><polygon points="32,6 58,54 44,54 32,40 20,54 6,54"/></svg>
-            </div>
-            <div class="title-skin" data-skin="1">
-                <svg viewBox="0 0 64 64" style="fill:#ffffff"><polygon points="32,4 52,30 44,30 44,58 20,58 20,30 12,30"/></svg>
-            </div>
-            <div class="title-skin" data-skin="2">
-                <svg viewBox="0 0 64 64" style="fill:#ffffff"><polygon points="32,6 38,30 56,30 38,34 38,60 26,60 26,34 8,30 26,30"/></svg>
-            </div>
-            <div class="title-skin" data-skin="3">
-                <svg viewBox="0 0 64 64" style="fill:#ffffff"><polygon points="32,6 56,54 46,54 40,44 24,44 18,54 8,54"/><rect x="22" y="30" width="20" height="10"/><rect x="25" y="18" width="14" height="8"/></svg>
-            </div>
-            <div class="title-skin" data-skin="4">
-                <svg viewBox="0 0 64 64" style="fill:#ffffff"><polygon points="32,4 42,24 55,24 32,40 32,62 32,40 9,24 22,24"/></svg>
-            </div>
-            <div class="title-skin" data-skin="5">
-                <svg viewBox="0 0 64 64" style="fill:#ffffff"><path d="M32 6L46 28L56 28L38 38L44 58L32 48L20 58L26 38L8 28L18 28Z"/><circle cx="32" cy="38" r="4"/></svg>
-            </div>
-        </div>
-        <div class="title-color">
-            <input type="color" id="titleColorPicker" value="#00ffcc">
-        </div>
         <div class="start-prompt">TAP OR PRESS SPACE TO LAUNCH</div>
     </div>
 
@@ -874,6 +827,11 @@
         });
         document.getElementById('shipColorPicker').addEventListener('click', (e) => {
             e.stopPropagation();
+            e.preventDefault();
+        });
+        document.getElementById('shipColorPicker').addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
         });
 
         document.addEventListener('click', () => {
@@ -956,42 +914,6 @@
 
         document.getElementById('hud').style.display = 'none';
         document.getElementById('minimap').style.display = 'none';
-
-        document.querySelectorAll('.title-skin').forEach((opt, i) => {
-            opt.addEventListener('click', (e) => {
-                e.stopPropagation();
-                ship.skin = i;
-                const color = document.getElementById('titleColorPicker').value;
-                ship.color = color;
-                document.querySelectorAll('.title-skin').forEach(o => {
-                    o.classList.remove('selected');
-                    o.querySelector('svg').style.fill = '#ffffff';
-                    o.querySelectorAll('svg *').forEach(c => c.style.fill = '#ffffff');
-                });
-                opt.classList.add('selected');
-                opt.querySelector('svg').style.fill = color;
-                opt.querySelectorAll('svg *').forEach(c => c.style.fill = color);
-            });
-            opt.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                opt.click();
-            });
-        });
-
-        document.getElementById('titleColorPicker').addEventListener('input', (e) => {
-            const color = e.target.value;
-            ship.color = color;
-            const selected = document.querySelector('.title-skin.selected');
-            if (selected) {
-                selected.querySelector('svg').style.fill = color;
-                selected.querySelectorAll('svg *').forEach(c => c.style.fill = color);
-            }
-            document.getElementById('shipColorPicker').value = color;
-        });
-        document.getElementById('titleColorPicker').addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
 
         generateStars();
         generateNebulae();
